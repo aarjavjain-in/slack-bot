@@ -8,7 +8,7 @@ const app = new App({
   socketMode: true,
 });
 
-// Command 1: Ping / Latency
+// 1. Ping Command
 app.command("/dumb-bot-ping", async ({ ack, respond }) => {
   const start = Date.now();
   await ack();
@@ -16,7 +16,7 @@ app.command("/dumb-bot-ping", async ({ ack, respond }) => {
   await respond({ text: `Pong! 🏓\nLatency: ${latency}ms` });
 });
 
-// Command 2: Help menu
+// 2. Help Command
 app.command("/dumb-bot-help", async ({ ack, respond }) => {
   await ack();
   await respond({
@@ -24,7 +24,7 @@ app.command("/dumb-bot-help", async ({ ack, respond }) => {
   });
 });
 
-// Command 3: Cat Fact (API call)
+// 3. Cat Fact Command (uses axios + try/catch)
 app.command("/dumb-bot-catfact", async ({ ack, respond }) => {
   await ack();
   try {
@@ -35,24 +35,12 @@ app.command("/dumb-bot-catfact", async ({ ack, respond }) => {
   }
 });
 
+// Global error catcher to stop random crashes
+app.error(async (error) => {
+  console.error("Bolt caught an error:", error);
+});
+
 (async () => {
   await app.start();
   console.log("⚡️ Bolt app is running!");
 })();
-
-
-app.command("/dumb-bot-joke", async ({ ack, respond }) => {
-  await ack();
-
-  try {
-    const response = await axios.get("https://official-joke-api.appspot.com/random_joke");
-    await respond({
-      text:
-`${response.data.setup}
-
-${response.data.punchline}`
-    });
-  } catch (err) {
-    await respond({ text: "Failed to fetch a joke." });
-  }
-});
